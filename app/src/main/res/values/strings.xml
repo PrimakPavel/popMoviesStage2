@@ -25,4 +25,5 @@
     <string name="retry">Retry</string>
     <string name="connection_error_message">You have some problems with connection. Please, try again!</string>
     <string name="youtube_error_message">Sorry but Youtube is not available on your device</string>
+    <string name="auth_or_not_found_http_error">Http Error! Please check your API key or try again</string>
 </resources>

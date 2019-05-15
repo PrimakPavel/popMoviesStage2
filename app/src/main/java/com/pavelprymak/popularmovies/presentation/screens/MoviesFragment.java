@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pavelprymak.popularmovies.R;
+import com.pavelprymak.popularmovies.network.Constants;
 import com.pavelprymak.popularmovies.presentation.adapter.MovieAdapter;
 import com.pavelprymak.popularmovies.presentation.adapter.MoviesListItemClickListener;
 import com.pavelprymak.popularmovies.presentation.common.BaseFragment;
@@ -125,6 +127,10 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
         mMoviesViewModel.getErrorData().observe(this, throwable -> {
             mAdapter.submitList(null);
             mConnectionErrorLayout.setVisibility(View.VISIBLE);
+            if (throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_AUTH_ERROR)
+                    || throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_NOT_FOUND_ERROR)) {
+                Toast.makeText(getContext(), R.string.auth_or_not_found_http_error, Toast.LENGTH_LONG).show();
+            }
         });
         mMoviesViewModel.prepareMoviePagedList();
     }

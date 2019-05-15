@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PositionalDataSource;
 
+import com.facebook.stetho.server.http.HttpStatus;
 import com.pavelprymak.popularmovies.network.Constants;
 import com.pavelprymak.popularmovies.network.MoviesApiController;
 import com.pavelprymak.popularmovies.network.pojo.moviesList.MoviesResponse;
@@ -47,9 +48,13 @@ public class MoviesDataSource extends PositionalDataSource<ResultsItem> {
             @Override
             public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
                 mLoadData.postValue(false);
-                if (response.body() != null) {
-                    mLastPageNum = response.body().getPage() + 1;
-                    callback.onResult(response.body().getResults(), 0);
+                if (response.code() == HttpStatus.HTTP_OK) {
+                    if (response.body() != null) {
+                        mLastPageNum = response.body().getPage() + 1;
+                        callback.onResult(response.body().getResults(), 0);
+                    }
+                } else {
+                    mErrorData.postValue(new Throwable(String.valueOf(response.code())));
                 }
             }
 
@@ -69,9 +74,13 @@ public class MoviesDataSource extends PositionalDataSource<ResultsItem> {
             @Override
             public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
                 mLoadData.postValue(false);
-                if (response.body() != null) {
-                    mLastPageNum = response.body().getPage() + 1;
-                    callback.onResult(response.body().getResults());
+                if (response.code() == HttpStatus.HTTP_OK) {
+                    if (response.body() != null) {
+                        mLastPageNum = response.body().getPage() + 1;
+                        callback.onResult(response.body().getResults());
+                    }
+                } else {
+                    mErrorData.postValue(new Throwable(String.valueOf(response.code())));
                 }
             }
 

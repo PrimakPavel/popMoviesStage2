@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".presentation.screens.MovieDetailsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:text="@string/connection_error_message"
+                android:layout_margin="@dimen/margin_base"
+                android:gravity="center"
+                android:textColor="@color/textColorSecondary"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/retry_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:text="@string/retry" />
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/movie_poster_iv"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/movie_picture_content_description"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/image_load_error_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/movie_error_picture_content_description"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/movie_poster_iv"
+            app:layout_constraintEnd_toEndOf="@+id/movie_poster_iv"
+            app:layout_constraintStart_toStartOf="@+id/movie_poster_iv"
+            app:layout_constraintTop_toTopOf="@+id/movie_poster_iv"
+            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <FrameLayout
+            android:id="@+id/title_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_mid"
+            android:background="@color/grayMid"
+            app:layout_constraintTop_toBottomOf="@+id/movie_poster_iv">
+
+            <TextView
+                android:id="@+id/movie_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_base"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/large_text_size"
+                tools:text="@string/movie_title" />
+
+        </FrameLayout>
+
+
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_base"
+            android:columnCount="2"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/title_container">
+            <!-- DURATION-->
+            <TextView
+                android:id="@+id/duration_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_duration"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/duration_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                tools:text="01:25"
+                tools:visibility="visible" />
+
+            <!-- COUNTRY-->
+            <TextView
+                android:id="@+id/country_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_country"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/country_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="USA, Canada"
+                tools:visibility="visible" />
+
+            <!-- RELEASE DATE-->
+            <TextView
+                android:id="@+id/release_date_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_release_date"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/release_date_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="2014"
+                tools:visibility="visible" />
+
+
+            <!-- GENDER-->
+            <TextView
+                android:id="@+id/genre_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_genre"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/genre_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="Drama, Melodrama"
+                tools:visibility="visible" />
+
+            <!-- AUDIO-->
+            <TextView
+                android:id="@+id/audio_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_audio"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/audio_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="English"
+                tools:visibility="visible" />
+
+            <!-- RATING-->
+            <TextView
+                android:id="@+id/vote_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_rating"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/vote_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="8.4"
+                tools:visibility="visible" />
+
+            <!-- BUDGET-->
+            <TextView
+                android:id="@+id/budget_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_budget"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/budget_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="63000000$"
+                tools:visibility="visible" />
+
+            <!-- REVENUE-->
+            <TextView
+                android:id="@+id/revenue_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_revenue"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/revenue_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="333000000$"
+                tools:visibility="visible" />
+
+
+            <!-- HOME PAGE-->
+            <TextView
+                android:id="@+id/homepage_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/movie_home_page"
+                android:textSize="@dimen/mid_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/homepage_tv"
+                style="@style/AppTheme.SecondaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:visibility="gone"
+                tools:text="http://www.foxmovies.com/movies/fight-club"
+                tools:visibility="visible" />
+        </GridLayout>
+
+        <TextView
+            android:id="@+id/movie_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_base"
+            android:textColor="@color/textColorSecondary"
+            android:textSize="@dimen/mid_text_size"
+            app:layout_constraintTop_toBottomOf="@+id/gridLayout"
+            tools:text="Some movie description" />
+
+        <TextView
+            android:id="@+id/prod_companies_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_base"
+            android:text="@string/movie_companies"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/movie_description" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/companies_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/margin_base"
+            app:flexDirection="row"
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/prod_companies_tv" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

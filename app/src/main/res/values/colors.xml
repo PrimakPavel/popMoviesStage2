@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1e282c</color>
+    <color name="colorPrimaryDark">#161e21</color>
+    <color name="colorAccent">#039AF4</color>
+
+    <!-- Text-->
+    <color name="textColorPrimary">#ffffff</color>
+    <color name="textColorSecondary">#B3ffffff</color>
+    <color name="textColorThirdly">#80ffffff</color>
+    <color name="textColorMarkYellow">#FDD835</color>
+
+    <color name="colorBackground">#263135</color>
+
+    <color name="gray">#59666C</color>
+    <color name="grayMidDark">#263238</color>
+    <color name="grayMid">#37474f</color>
+    <color name="blueLight">#57b5ed</color>
+
+    <!-- recycler item-->
+    <color name="markItemBackground">@color/grayMid</color>
+    <color name="defaultItemBackground">@color/colorBackground</color>
+</resources>

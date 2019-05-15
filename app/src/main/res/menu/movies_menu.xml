@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/popular_action"
+        android:checkable="true"
+        android:title="@string/movie_filter_popular"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/top_rated_action"
+        android:checkable="true"
+        android:title="@string/movie_filter_top_rated"
+        app:showAsAction="never" />
+</menu>

@@ -143,7 +143,7 @@ public class MovieDetailsFragment extends BaseFragment {
             mTitleTv.setText(movieDetails.getOriginalTitle());
         }
         //Duration
-        if (movieDetails.getRuntime() != null) {
+        if (movieDetails.getRuntime() != null && movieDetails.getRuntime() > 0) {
             mDurationTv.setVisibility(View.VISIBLE);
             mDurationLabelTv.setVisibility(View.VISIBLE);
             mDurationTv.setText(TimeConverter.convertMinToHHMM(movieDetails.getRuntime()));
@@ -204,14 +204,14 @@ public class MovieDetailsFragment extends BaseFragment {
         }
 
         //Budget
-        if (movieDetails.getBudget() != null) {
+        if (movieDetails.getBudget() != null && movieDetails.getBudget() > 0) {
             mBudgetTv.setVisibility(View.VISIBLE);
             mBudgetLabelTv.setVisibility(View.VISIBLE);
             mBudgetTv.setText(String.format(Locale.ENGLISH, "%,d$", movieDetails.getBudget()).replace(',', ' '));
         }
 
         //Revenue
-        if (movieDetails.getRevenue() != null) {
+        if (movieDetails.getRevenue() != null && movieDetails.getRevenue() > 0) {
             mRevenueTv.setVisibility(View.VISIBLE);
             mRevenueLabelTv.setVisibility(View.VISIBLE);
             mRevenueTv.setText(String.format(Locale.ENGLISH, "%,d$", movieDetails.getRevenue()).replace(',', ' '));

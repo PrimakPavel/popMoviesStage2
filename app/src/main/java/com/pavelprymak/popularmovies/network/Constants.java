@@ -1,8 +1,10 @@
 package com.pavelprymak.popularmovies.network;
 
+import com.pavelprymak.popularmovies.BuildConfig;
+
 public class Constants {
 
-    public static final String API_KEY = "XXXXXXXXXXXXXXXXXXX";
+    public static final String API_KEY = BuildConfig.API_KEY;
 
     static final String BASE_URL = "https://api.themoviedb.org/";
     public static final String PICTURE_BASE_URL = "https://image.tmdb.org/t/p/w185";

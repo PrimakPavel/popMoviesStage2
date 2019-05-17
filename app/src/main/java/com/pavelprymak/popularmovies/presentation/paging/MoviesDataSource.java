@@ -21,7 +21,7 @@ public class MoviesDataSource extends PositionalDataSource<ResultsItem> {
     public static final int POPULAR_MOVIES = 1;
     public static final int TOP_RATED_MOVIES = 2;
 
-    private static final int FIRST_PAGE_NUM = 990;
+    private static final int FIRST_PAGE_NUM = 1;
 
     private MutableLiveData<Boolean> mLoadData;
     private ActionLiveData<Throwable> mErrorData;

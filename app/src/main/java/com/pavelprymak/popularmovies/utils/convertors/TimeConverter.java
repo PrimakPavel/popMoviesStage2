@@ -1,4 +1,4 @@
-package com.pavelprymak.popularmovies.utils;
+package com.pavelprymak.popularmovies.utils.convertors;
 
 import java.util.Locale;
 

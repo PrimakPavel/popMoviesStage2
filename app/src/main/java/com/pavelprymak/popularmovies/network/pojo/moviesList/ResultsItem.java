@@ -1,5 +1,6 @@
 package com.pavelprymak.popularmovies.network.pojo.moviesList;
 
+import java.util.Date;
 import java.util.List;
 import com.squareup.moshi.Json;
 
@@ -47,6 +48,16 @@ public class ResultsItem{
 
 	@Json(name = "vote_count")
 	private int voteCount;
+
+	private long updatedAt;
+
+	public long getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(long updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 
 	public void setOverview(String overview){
 		this.overview = overview;
@@ -163,7 +174,7 @@ public class ResultsItem{
 	@Override
  	public String toString(){
 		return 
-			"ResultsItem{" + 
+			"ReviewsResultsItem{" +
 			"overview = '" + overview + '\'' + 
 			",original_language = '" + originalLanguage + '\'' + 
 			",original_title = '" + originalTitle + '\'' + 

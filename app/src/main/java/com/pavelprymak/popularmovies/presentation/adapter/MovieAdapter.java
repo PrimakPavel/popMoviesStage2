@@ -97,7 +97,7 @@ public class MovieAdapter extends PagedListAdapter<ResultsItem, MovieAdapter.Vie
                 }
                 //TITLE
                 if (movie.getOriginalTitle() != null) {
-                    mTitleTv.setText(movie.getTitle());
+                    mTitleTv.setText(movie.getOriginalTitle());
                 } else {
                     mTitleTv.setText(EMPTY);
                 }

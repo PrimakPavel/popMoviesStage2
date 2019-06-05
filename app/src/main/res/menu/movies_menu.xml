@@ -11,4 +11,9 @@
         android:checkable="true"
         android:title="@string/movie_filter_top_rated"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/favorite_action"
+        android:checkable="true"
+        android:title="@string/movie_filter_favorite"
+        app:showAsAction="never" />
 </menu>

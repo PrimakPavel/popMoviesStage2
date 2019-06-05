@@ -19,5 +19,6 @@
 
     <!-- recycler item-->
     <color name="markItemBackground">@color/grayMid</color>
+    <color name="grayMid50">#8037474f</color>
     <color name="defaultItemBackground">@color/colorBackground</color>
 </resources>

@@ -20,6 +20,7 @@ import retrofit2.Response;
 public class MoviesDataSource extends PositionalDataSource<ResultsItem> {
     public static final int POPULAR_MOVIES = 1;
     public static final int TOP_RATED_MOVIES = 2;
+    public static final int FAVORITE_MOVIES = 3;
 
     private static final int FIRST_PAGE_NUM = 1;
 
@@ -65,7 +66,7 @@ public class MoviesDataSource extends PositionalDataSource<ResultsItem> {
             @Override
             public void onFailure(@NonNull Call<MoviesResponse> call, @NonNull Throwable t) {
                 mLoadData.postValue(false);
-                mErrorData.postValue(t);
+                mErrorData.postValue(new Throwable(Constants.HttpErrorCodes.CONNECTION_ERROR));
             }
         });
     }
@@ -96,7 +97,7 @@ public class MoviesDataSource extends PositionalDataSource<ResultsItem> {
             @Override
             public void onFailure(@NonNull Call<MoviesResponse> call, @NonNull Throwable t) {
                 mLoadData.postValue(false);
-                mErrorData.postValue(t);
+                mErrorData.postValue(new Throwable(Constants.HttpErrorCodes.CONNECTION_ERROR));
             }
         });
     }

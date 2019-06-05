@@ -1,6 +1,8 @@
 package com.pavelprymak.popularmovies.network;
 
 import com.pavelprymak.popularmovies.network.pojo.movieInfo.MovieDetailsResponse;
+import com.pavelprymak.popularmovies.network.pojo.movieReviews.MovieReviewsResponse;
+import com.pavelprymak.popularmovies.network.pojo.movieVideos.MovieVideosResponse;
 import com.pavelprymak.popularmovies.network.pojo.moviesList.MoviesResponse;
 
 import org.junit.Before;
@@ -47,5 +49,23 @@ public class MoviesApiTest {
         MovieDetailsResponse movieDetailsResponse = response.body();
         assertNotNull(movieDetailsResponse);
         assertEquals(movieId, movieDetailsResponse.getId());
+    }
+
+    @Test
+    public void getMovieVideos() throws Exception {
+        final int movieId = 550;
+        Response<MovieVideosResponse> response = api.getMovieVideos(movieId, Constants.API_KEY).execute();
+        MovieVideosResponse movieVideosResponse = response.body();
+        assertNotNull(movieVideosResponse);
+        assertEquals(movieId, movieVideosResponse.getId());
+    }
+
+    @Test
+    public void getMovieReviews() throws Exception {
+        final int movieId = 550;
+        Response<MovieReviewsResponse> response = api.getMovieReviews(movieId, Constants.API_KEY).execute();
+        MovieReviewsResponse movieReviewsResponse = response.body();
+        assertNotNull(movieReviewsResponse);
+        assertEquals(movieId, movieReviewsResponse.getId());
     }
 }

@@ -8,8 +8,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.FAVORITE_MOVIES;
 import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.POPULAR_MOVIES;
 import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.TOP_RATED_MOVIES;
 import static com.pavelprymak.popularmovies.presentation.screens.MovieDetailsFragment.ARG_MOVIE_ID;
@@ -50,11 +53,16 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
     ProgressBar mProgressBar;
 
     @BindView(R.id.error_layout)
-    LinearLayout mConnectionErrorLayout;
+    LinearLayout mErrorLayout;
+
+    @BindView(R.id.tv_error_message)
+    TextView mErrorMessage;
+
+    @BindView(R.id.retry_btn)
+    Button mRetryBtn;
 
     @OnClick(R.id.retry_btn)
     void onRetryBtnClick() {
-        mConnectionErrorLayout.setVisibility(View.GONE);
         mMoviesViewModel.cleanData();
         mMoviesViewModel.prepareMoviePagedList();
     }
@@ -89,6 +97,9 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
             case R.id.top_rated_action:
                 setMovieFilterType(TOP_RATED_MOVIES);
                 return true;
+            case R.id.favorite_action:
+                setMovieFilterType(FAVORITE_MOVIES);
+                return true;
         }
         return false;
     }
@@ -102,6 +113,9 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
                 break;
             case TOP_RATED_MOVIES:
                 mMenu.findItem(R.id.top_rated_action).setChecked(true);
+                break;
+            case FAVORITE_MOVIES:
+                mMenu.findItem(R.id.favorite_action).setChecked(true);
                 break;
         }
         super.onPrepareOptionsMenu(menu);
@@ -120,19 +134,39 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mNavController = Navigation.findNavController(view);
-
         initMoviesRecyclerView();
-        mMoviesViewModel.getMoviesData().observe(this, resultsItems -> mAdapter.submitList(resultsItems));
+        mMoviesViewModel.getMoviesData().observe(this, resultsItems -> {
+            mAdapter = new MovieAdapter(this);
+            mMoviesRecycler.setAdapter(mAdapter);
+            mAdapter.submitList(resultsItems);
+            if (resultsItems != null) {
+                mErrorLayout.setVisibility(View.GONE);
+            }
+        });
         mMoviesViewModel.getLoadingData().observe(this, this::showProgressBar);
         mMoviesViewModel.getErrorData().observe(this, throwable -> {
             mAdapter.submitList(null);
-            mConnectionErrorLayout.setVisibility(View.VISIBLE);
             if (throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_AUTH_ERROR)
-                    || throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_NOT_FOUND_ERROR)) {
-                Toast.makeText(getContext(), R.string.auth_or_not_found_http_error, Toast.LENGTH_LONG).show();
+                    || throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_NOT_FOUND_ERROR)
+                    || throwable.getMessage().equals(Constants.HttpErrorCodes.CONNECTION_ERROR)
+            ) {
+                showError(R.string.auth_or_not_found_http_error, true);
+            } else if (throwable.getMessage().equals(Constants.DbErrorCodes.DB_EMPTY_ERROR)) {
+                showError(R.string.empty_favorite_movies_list_error, false);
             }
         });
         mMoviesViewModel.prepareMoviePagedList();
+    }
+
+    private void showError(int messageResId, boolean isShowRetryBtn) {
+        mErrorMessage.setText(messageResId);
+        if (isShowRetryBtn) {
+            mRetryBtn.setVisibility(View.VISIBLE);
+        } else {
+            mRetryBtn.setVisibility(View.GONE);
+        }
+        Toast.makeText(getContext(), messageResId, Toast.LENGTH_LONG).show();
+        mErrorLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -158,8 +192,6 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
     private void initMoviesRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), getResources().getInteger(R.integer.list_colons_num), RecyclerView.VERTICAL, false);
         mMoviesRecycler.setLayoutManager(layoutManager);
-        mAdapter = new MovieAdapter(this);
-        mMoviesRecycler.setAdapter(mAdapter);
     }
 
     private void uncheckAllMenuItems() {

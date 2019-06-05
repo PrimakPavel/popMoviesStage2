@@ -7,7 +7,9 @@
     <string name="movie_title">Title:</string>
     <string name="movie_duration">Duration:</string>
     <string name="movie_country">Country:</string>
-    <string name="movie_companies">Production Companies:</string>
+    <string name="movie_users_reviews">Reviews:</string>
+    <string name="movie_users_reviews_author">Author:</string>
+    <string name="movie_trailers">Trailers:</string>
     <string name="movie_release_date">Release Date:</string>
     <string name="movie_genre">Genre:</string>
     <string name="movie_audio">Audio:</string>
@@ -20,10 +22,14 @@
 
     <string name="movie_filter_popular">Popular</string>
     <string name="movie_filter_top_rated">Top Rated</string>
+    <string name="movie_filter_favorite">Favorite</string>
+    <string name="add_to_favorite">Add To Favorite</string>
+    <string name="delete_from_favorite">Delete From Favorite</string>
 
 
     <string name="retry">Retry</string>
     <string name="connection_error_message">You have some problems with connection. Please, try again!</string>
     <string name="youtube_error_message">Sorry but Youtube is not available on your device</string>
     <string name="auth_or_not_found_http_error">Http Error! Please check your API key or try again</string>
+    <string name="empty_favorite_movies_list_error">Your Favorite Movies list is empty!!!</string>
 </resources>

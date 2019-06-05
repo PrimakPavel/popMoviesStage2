@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/error_layout"
+            android:id="@+id/network_error_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
@@ -79,8 +79,20 @@
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/large_text_size"
                 tools:text="@string/movie_title" />
-
         </FrameLayout>
+
+        <Button
+            android:id="@+id/favorite_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_margin="16dp"
+            android:background="@color/grayMid50"
+            android:padding="10dp"
+            android:text="@string/add_to_favorite"
+            android:textColor="@color/colorAccent"
+            app:layout_constraintBottom_toTopOf="@+id/title_container"
+            app:layout_constraintEnd_toEndOf="parent" />
 
 
         <GridLayout
@@ -287,26 +299,49 @@
             tools:text="Some movie description" />
 
         <TextView
-            android:id="@+id/prod_companies_tv"
+            android:id="@+id/user_reviews_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_base"
-            android:text="@string/movie_companies"
+            android:text="@string/movie_users_reviews"
             android:textStyle="bold"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/movie_description" />
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@+id/trailer_container" />
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/companies_container"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/reviews_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/margin_base"
-            app:flexDirection="row"
-            app:flexWrap="wrap"
-            app:justifyContent="flex_start"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/prod_companies_tv" />
+            android:orientation="vertical"
+            tools:visibility="visible"
+            tools:layout_height="100dp"
+            app:layout_constraintTop_toBottomOf="@+id/user_reviews_label" />
+
+        <TextView
+            android:id="@+id/trailers_label_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_base"
+            android:text="@string/movie_trailers"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@+id/movie_description" />
+
+        <LinearLayout
+            android:id="@+id/trailer_container"
+            android:layout_width="match_parent"
+            tools:visibility="visible"
+            android:layout_margin="8dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:layout_height="200dp"
+            app:layout_constraintTop_toBottomOf="@+id/trailers_label_tv">
+
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar"

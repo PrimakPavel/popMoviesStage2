@@ -13,10 +13,16 @@ public class Constants {
 
     static final String PATH_MAIN = "3/movie/";
     static final String PATH_POPULAR = "popular";
+    static final String PATH_VIDEOS = "/videos";
+    static final String PATH_REVIEWS = "/reviews";
     static final String PATH_TOP_RATED = "top_rated";
 
     public  class HttpErrorCodes{
         public static final String HTTP_AUTH_ERROR = "401";
         public static final String HTTP_NOT_FOUND_ERROR = "404";
+        public static final String CONNECTION_ERROR = "ConnectionError";
+    }
+    public class DbErrorCodes{
+        public static final String DB_EMPTY_ERROR = "DbEmpty";
     }
 }

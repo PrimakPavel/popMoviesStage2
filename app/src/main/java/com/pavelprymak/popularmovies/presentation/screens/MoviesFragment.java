@@ -8,14 +8,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,15 +21,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pavelprymak.popularmovies.R;
+import com.pavelprymak.popularmovies.databinding.FragmentMoviesBinding;
 import com.pavelprymak.popularmovies.network.Constants;
 import com.pavelprymak.popularmovies.presentation.adapter.MovieAdapter;
 import com.pavelprymak.popularmovies.presentation.adapter.MoviesListItemClickListener;
-import com.pavelprymak.popularmovies.presentation.common.BaseFragment;
 import com.pavelprymak.popularmovies.presentation.viewModels.MoviesListViewModel;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.FAVORITE_MOVIES;
 import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.POPULAR_MOVIES;
@@ -39,30 +33,15 @@ import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource
 import static com.pavelprymak.popularmovies.presentation.screens.MovieDetailsFragment.ARG_MOVIE_ID;
 
 
-public class MoviesFragment extends BaseFragment implements MoviesListItemClickListener {
+public class MoviesFragment extends Fragment implements MoviesListItemClickListener {
     private NavController mNavController;
     private Menu mMenu;
+    private FragmentMoviesBinding mBinding;
 
     private MovieAdapter mAdapter;
     private MoviesListViewModel mMoviesViewModel;
 
-    @BindView(R.id.recycler_view_movies)
-    RecyclerView mMoviesRecycler;
-
-    @BindView(R.id.pb_loading_indicator)
-    ProgressBar mProgressBar;
-
-    @BindView(R.id.error_layout)
-    LinearLayout mErrorLayout;
-
-    @BindView(R.id.tv_error_message)
-    TextView mErrorMessage;
-
-    @BindView(R.id.retry_btn)
-    Button mRetryBtn;
-
-    @OnClick(R.id.retry_btn)
-    void onRetryBtnClick() {
+    private void onRetryBtnClick() {
         mMoviesViewModel.cleanData();
         mMoviesViewModel.prepareMoviePagedList();
     }
@@ -124,10 +103,9 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_movies, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movies, container, false);
         mMoviesViewModel = ViewModelProviders.of(this).get(MoviesListViewModel.class);
-        mUnbinder = ButterKnife.bind(this, view);
-        return view;
+        return mBinding.getRoot();
     }
 
     @Override
@@ -137,10 +115,10 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
         initMoviesRecyclerView();
         mMoviesViewModel.getMoviesData().observe(this, resultsItems -> {
             mAdapter = new MovieAdapter(this);
-            mMoviesRecycler.setAdapter(mAdapter);
+            mBinding.recyclerMovies.setAdapter(mAdapter);
             mAdapter.submitList(resultsItems);
             if (resultsItems != null) {
-                mErrorLayout.setVisibility(View.GONE);
+                mBinding.errorLayout.setVisibility(View.GONE);
             }
         });
         mMoviesViewModel.getLoadingData().observe(this, this::showProgressBar);
@@ -156,17 +134,18 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
             }
         });
         mMoviesViewModel.prepareMoviePagedList();
+        mBinding.retryBtn.setOnClickListener(v -> onRetryBtnClick());
     }
 
     private void showError(int messageResId, boolean isShowRetryBtn) {
-        mErrorMessage.setText(messageResId);
+        mBinding.tvErrorMessage.setText(messageResId);
         if (isShowRetryBtn) {
-            mRetryBtn.setVisibility(View.VISIBLE);
+            mBinding.retryBtn.setVisibility(View.VISIBLE);
         } else {
-            mRetryBtn.setVisibility(View.GONE);
+            mBinding.retryBtn.setVisibility(View.GONE);
         }
         Toast.makeText(getContext(), messageResId, Toast.LENGTH_LONG).show();
-        mErrorLayout.setVisibility(View.VISIBLE);
+        mBinding.errorLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -183,15 +162,15 @@ public class MoviesFragment extends BaseFragment implements MoviesListItemClickL
 
     private void showProgressBar(Boolean isShow) {
         if (isShow != null && isShow) {
-            mProgressBar.setVisibility(View.VISIBLE);
+            mBinding.pbLoadingIndicator.setVisibility(View.VISIBLE);
         } else {
-            mProgressBar.setVisibility(View.GONE);
+            mBinding.pbLoadingIndicator.setVisibility(View.GONE);
         }
     }
 
     private void initMoviesRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), getResources().getInteger(R.integer.list_colons_num), RecyclerView.VERTICAL, false);
-        mMoviesRecycler.setLayoutManager(layoutManager);
+        mBinding.recyclerMovies.setLayoutManager(layoutManager);
     }
 
     private void uncheckAllMenuItems() {

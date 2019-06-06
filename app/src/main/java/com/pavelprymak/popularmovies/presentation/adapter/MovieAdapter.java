@@ -4,20 +4,17 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pavelprymak.popularmovies.R;
+import com.pavelprymak.popularmovies.databinding.ItemViewMovieBinding;
 import com.pavelprymak.popularmovies.network.pojo.moviesList.ResultsItem;
 import com.squareup.picasso.Picasso;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.pavelprymak.popularmovies.network.Constants.PICTURE_BASE_URL;
 
@@ -49,8 +46,8 @@ public class MovieAdapter extends PagedListAdapter<ResultsItem, MovieAdapter.Vie
     public ViewHolderMovie onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        View view = layoutInflater.inflate(R.layout.item_view_movie, parent, false);
-        return new ViewHolderMovie(view);
+        ItemViewMovieBinding itemViewMovieBinding = DataBindingUtil.inflate(layoutInflater,R.layout.item_view_movie,parent,false);
+        return new ViewHolderMovie(itemViewMovieBinding);
     }
 
     @Override
@@ -59,29 +56,14 @@ public class MovieAdapter extends PagedListAdapter<ResultsItem, MovieAdapter.Vie
     }
 
     public class ViewHolderMovie extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        @BindView(R.id.movie_image_iv)
-        public ImageView mPosterIv;
-
-        @BindView(R.id.movie_title_tv)
-        public TextView mTitleTv;
-
-        @BindView(R.id.movie_release_date)
-        public TextView mReleaseDateTv;
-
-        @BindView(R.id.movie_original_language)
-        public TextView mOriginalLanguageTv;
-
-        @BindView(R.id.movie_rating)
-        public TextView mRatingTv;
+        private final ItemViewMovieBinding binding;
 
         private static final String EMPTY = "";
 
-
-        ViewHolderMovie(@NonNull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
+        ViewHolderMovie(@NonNull ItemViewMovieBinding itemBinding) {
+            super(itemBinding.getRoot());
+            this.binding = itemBinding;
+            itemBinding.getRoot().setOnClickListener(this);
         }
 
         void bind(int position) {
@@ -91,36 +73,36 @@ public class MovieAdapter extends PagedListAdapter<ResultsItem, MovieAdapter.Vie
                 if (movie.getPosterPath() != null) {
                     Picasso.get()
                             .load(PICTURE_BASE_URL + movie.getPosterPath())
-                            .into(mPosterIv);
+                            .into(binding.movieImageIv);
                 } else {
-                    mPosterIv.setImageDrawable(null);
+                    binding.movieImageIv.setImageDrawable(null);
                 }
                 //TITLE
                 if (movie.getOriginalTitle() != null) {
-                    mTitleTv.setText(movie.getOriginalTitle());
+                    binding.movieTitleTv.setText(movie.getOriginalTitle());
                 } else {
-                    mTitleTv.setText(EMPTY);
+                    binding.movieTitleTv.setText(EMPTY);
                 }
                 //RELEASE DATE
                 if (movie.getReleaseDate() != null) {
                     String releaseDate = mContext.getResources().getString(R.string.movie_release_date) + movie.getReleaseDate();
-                    mReleaseDateTv.setText(releaseDate);
+                    binding.movieReleaseDateTv.setText(releaseDate);
                 } else {
-                    mReleaseDateTv.setText(EMPTY);
+                    binding.movieReleaseDateTv.setText(EMPTY);
                 }
                 //ORIGINAL LANGUAGE
                 if (movie.getOriginalLanguage() != null) {
                     String originalLanguage = mContext.getResources().getString(R.string.movie_original_language) + movie.getOriginalLanguage();
-                    mOriginalLanguageTv.setText(originalLanguage);
+                   binding.movieOriginalLanguageTv.setText(originalLanguage);
                 } else {
-                    mOriginalLanguageTv.setText(EMPTY);
+                   binding.movieOriginalLanguageTv.setText(EMPTY);
                 }
                 //RATING
                 if (movie.getVoteAverage() > 0.0) {
                     String rating = mContext.getResources().getString(R.string.movie_rating) + movie.getVoteAverage();
-                    mRatingTv.setText(rating);
+                    binding.movieRatingTv.setText(rating);
                 } else {
-                    mRatingTv.setText(EMPTY);
+                    binding.movieRatingTv.setText(EMPTY);
                 }
             }
         }

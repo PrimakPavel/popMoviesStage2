@@ -2,33 +2,32 @@ package com.pavelprymak.popularmovies.presentation.screens;
 
 
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.pavelprymak.popularmovies.App;
 import com.pavelprymak.popularmovies.R;
+import com.pavelprymak.popularmovies.databinding.FragmentMovieDetailsBinding;
 import com.pavelprymak.popularmovies.db.FavoriteMovieEntry;
 import com.pavelprymak.popularmovies.network.pojo.movieInfo.GenresItem;
 import com.pavelprymak.popularmovies.network.pojo.movieInfo.MovieDetailsResponse;
 import com.pavelprymak.popularmovies.network.pojo.movieInfo.ProductionCountriesItem;
 import com.pavelprymak.popularmovies.network.pojo.movieInfo.SpokenLanguagesItem;
-import com.pavelprymak.popularmovies.network.pojo.movieReviews.MovieReviewsResponse;
 import com.pavelprymak.popularmovies.network.pojo.movieReviews.ReviewsResultsItem;
-import com.pavelprymak.popularmovies.network.pojo.movieVideos.MovieVideosResponse;
 import com.pavelprymak.popularmovies.network.pojo.movieVideos.TrailersResultsItem;
-import com.pavelprymak.popularmovies.presentation.common.BaseFragment;
+import com.pavelprymak.popularmovies.presentation.adapter.ReviewAdapter;
+import com.pavelprymak.popularmovies.presentation.adapter.ReviewListItemClickListener;
+import com.pavelprymak.popularmovies.presentation.adapter.TrailerAdapter;
+import com.pavelprymak.popularmovies.presentation.adapter.TrailerListClickListener;
 import com.pavelprymak.popularmovies.presentation.viewModels.MovieDetailsViewModel;
 import com.pavelprymak.popularmovies.utils.StringUtils;
 import com.pavelprymak.popularmovies.utils.YoutubeUtil;
@@ -37,84 +36,24 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.pavelprymak.popularmovies.network.Constants.PICTURE_HUGE_BASE_URL;
 
 
-public class MovieDetailsFragment extends BaseFragment {
-
+public class MovieDetailsFragment extends Fragment implements TrailerListClickListener, ReviewListItemClickListener {
+    private FragmentMovieDetailsBinding mBinding;
     static final String ARG_MOVIE_ID = "argMovieId";
     private int mMovieId;
+    private TrailerAdapter mTrailerAdapter;
+    private ReviewAdapter mReviewAdapter;
     private MovieDetailsResponse mMovieDetails;
     private MovieDetailsViewModel detailsViewModel;
-    @BindView(R.id.movie_poster_iv)
-    ImageView mPosterIv;
-    @BindView(R.id.progress_bar)
-    ProgressBar mProgressBar;
-    @BindView(R.id.image_load_error_iv)
-    ImageView mErrorLoadIv;
-    @BindView(R.id.network_error_layout)
-    LinearLayout mConnectionErrorLayout;
-    @BindView(R.id.movie_title_tv)
-    TextView mTitleTv;
-    @BindView(R.id.duration_tv)
-    TextView mDurationTv;
-    @BindView(R.id.duration_label_tv)
-    TextView mDurationLabelTv;
-    @BindView(R.id.country_tv)
-    TextView mCountryTv;
-    @BindView(R.id.country_label_tv)
-    TextView mCountryLabelTv;
-    @BindView(R.id.release_date_tv)
-    TextView mReleaseDateTv;
-    @BindView(R.id.release_date_label_tv)
-    TextView mReleaseDateLabelTv;
-    @BindView(R.id.genre_tv)
-    TextView mGenreTv;
-    @BindView(R.id.genre_label_tv)
-    TextView mGenreLabelTv;
-    @BindView(R.id.audio_tv)
-    TextView mAudioLanguageTv;
-    @BindView(R.id.audio_label_tv)
-    TextView mAudioLanguageLabelTv;
-    @BindView(R.id.vote_tv)
-    TextView mRatingTv;
-    @BindView(R.id.vote_label_tv)
-    TextView mRatingLabelTv;
-    @BindView(R.id.budget_tv)
-    TextView mBudgetTv;
-    @BindView(R.id.budget_label_tv)
-    TextView mBudgetLabelTv;
-    @BindView(R.id.revenue_tv)
-    TextView mRevenueTv;
-    @BindView(R.id.revenue_label_tv)
-    TextView mRevenueLabelTv;
-    @BindView(R.id.homepage_tv)
-    TextView mHomepageTv;
-    @BindView(R.id.homepage_label_tv)
-    TextView mHomepageLabelTv;
-    @BindView(R.id.movie_description)
-    TextView mDescriptionTv;
-    @BindView(R.id.user_reviews_label)
-    TextView mReviewsLabelTv;
-    @BindView(R.id.trailers_label_tv)
-    TextView mTrailersLabel;
-    @BindView(R.id.reviews_container)
-    LinearLayout mReviewsContainer;
-    @BindView(R.id.trailer_container)
-    LinearLayout mTrailerContainer;
 
-    @BindView(R.id.favorite_btn)
-    Button mFavoriteBtn;
 
-    @OnClick(R.id.retry_btn)
-    void onRetryBtnClick() {
-        mConnectionErrorLayout.setVisibility(View.GONE);
+    private void onRetryBtnClick() {
+        mBinding.errorLayout.setVisibility(View.GONE);
         detailsViewModel.getMovieDetailsById(mMovieId, false);
     }
 
@@ -130,9 +69,8 @@ public class MovieDetailsFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_movie_details, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
-        return view;
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_details, container, false);
+        return mBinding.getRoot();
     }
 
 
@@ -144,19 +82,30 @@ public class MovieDetailsFragment extends BaseFragment {
         detailsViewModel.getMovieVideosById(mMovieId, false);
         detailsViewModel.getMovieReviewsById(mMovieId, false);
         detailsViewModel.movieDetailsData.getData().observe(this, this::showAllMovieDetails);
-        detailsViewModel.movieDetailsData.getError().observe(this, throwable -> mConnectionErrorLayout.setVisibility(View.VISIBLE));
+        detailsViewModel.movieDetailsData.getError().observe(this, throwable -> mBinding.errorLayout.setVisibility(View.VISIBLE));
         detailsViewModel.movieDetailsData.getLoading().observe(this, this::showProgressBar);
-        detailsViewModel.movieVideosData.getData().observe(this, movieVideosResponse -> {
-            if (movieVideosResponse != null) {
-                prepareTrailers(movieVideosResponse);
+        detailsViewModel.movieVideosData.getData().observe(this, movieTrailersResponse -> {
+            if (movieTrailersResponse != null) {
+                List<TrailersResultsItem> trailersList = movieTrailersResponse.getResults();
+                if (trailersList != null && !trailersList.isEmpty())
+                    mBinding.trailersLabelTv.setVisibility(View.VISIBLE);
+                else mBinding.trailersLabelTv.setVisibility(View.GONE);
+                mTrailerAdapter.updateList(trailersList);
             }
         });
         detailsViewModel.movieReviewsData.getData().observe(this, movieReviewsResponse -> {
             if (movieReviewsResponse != null) {
-                prepareReviews(movieReviewsResponse);
+                List<ReviewsResultsItem> reviewsList = movieReviewsResponse.getResults();
+                if (reviewsList != null && !reviewsList.isEmpty())
+                    mBinding.userReviewsLabel.setVisibility(View.VISIBLE);
+                else mBinding.userReviewsLabel.setVisibility(View.GONE);
+                mReviewAdapter.updateList(reviewsList);
             }
         });
+        mBinding.retryBtn.setOnClickListener(v -> onRetryBtnClick());
         prepareFavoriteBtn();
+        initTrailersRecyclerView();
+        initReviewsRecyclerView();
     }
 
     @Override
@@ -170,13 +119,13 @@ public class MovieDetailsFragment extends BaseFragment {
         showMoviePoster(movieDetails.getPosterPath());
         //Title
         if (movieDetails.getOriginalTitle() != null) {
-            mTitleTv.setText(movieDetails.getOriginalTitle());
+            mBinding.movieTitleTv.setText(movieDetails.getOriginalTitle());
         }
         //Duration
         if (movieDetails.getRuntime() != null && movieDetails.getRuntime() > 0) {
-            mDurationTv.setVisibility(View.VISIBLE);
-            mDurationLabelTv.setVisibility(View.VISIBLE);
-            mDurationTv.setText(TimeConverter.convertMinToHHMM(movieDetails.getRuntime()));
+            mBinding.durationTv.setVisibility(View.VISIBLE);
+            mBinding.durationLabelTv.setVisibility(View.VISIBLE);
+            mBinding.durationTv.setText(TimeConverter.convertMinToHHMM(movieDetails.getRuntime()));
         }
 
         //Countries
@@ -187,16 +136,16 @@ public class MovieDetailsFragment extends BaseFragment {
                     countryNames.add(country.getName());
             }
             if (!countryNames.isEmpty()) {
-                mCountryTv.setVisibility(View.VISIBLE);
-                mCountryLabelTv.setVisibility(View.VISIBLE);
-                mCountryTv.setText(StringUtils.buildStringWithComaSeparator(countryNames));
+                mBinding.countryTv.setVisibility(View.VISIBLE);
+                mBinding.countryLabelTv.setVisibility(View.VISIBLE);
+                mBinding.countryTv.setText(StringUtils.buildStringWithComaSeparator(countryNames));
             }
         }
         //Release Date
         if (movieDetails.getReleaseDate() != null) {
-            mReleaseDateTv.setVisibility(View.VISIBLE);
-            mReleaseDateLabelTv.setVisibility(View.VISIBLE);
-            mReleaseDateTv.setText(movieDetails.getReleaseDate());
+            mBinding.releaseDateTv.setVisibility(View.VISIBLE);
+            mBinding.releaseDateLabelTv.setVisibility(View.VISIBLE);
+            mBinding.releaseDateTv.setText(movieDetails.getReleaseDate());
         }
 
         //Genre
@@ -207,9 +156,9 @@ public class MovieDetailsFragment extends BaseFragment {
                     genreNames.add(genre.getName());
             }
             if (!genreNames.isEmpty()) {
-                mGenreTv.setVisibility(View.VISIBLE);
-                mGenreLabelTv.setVisibility(View.VISIBLE);
-                mGenreTv.setText(StringUtils.buildStringWithComaSeparator(genreNames));
+                mBinding.genreTv.setVisibility(View.VISIBLE);
+                mBinding.genreLabelTv.setVisibility(View.VISIBLE);
+                mBinding.genreTv.setText(StringUtils.buildStringWithComaSeparator(genreNames));
             }
         }
 
@@ -221,66 +170,62 @@ public class MovieDetailsFragment extends BaseFragment {
                     languagesNames.add(language.getName());
             }
             if (!languagesNames.isEmpty()) {
-                mAudioLanguageTv.setVisibility(View.VISIBLE);
-                mAudioLanguageLabelTv.setVisibility(View.VISIBLE);
-                mAudioLanguageTv.setText(StringUtils.buildStringWithComaSeparator(languagesNames));
+                mBinding.audioTv.setVisibility(View.VISIBLE);
+                mBinding.audioLabelTv.setVisibility(View.VISIBLE);
+                mBinding.audioTv.setText(StringUtils.buildStringWithComaSeparator(languagesNames));
             }
         }
         //Rating
         if (movieDetails.getVoteAverage() > 0.0) {
-            mRatingTv.setVisibility(View.VISIBLE);
-            mRatingLabelTv.setVisibility(View.VISIBLE);
-            mRatingTv.setText(String.valueOf(movieDetails.getVoteAverage()));
+            mBinding.voteTv.setVisibility(View.VISIBLE);
+            mBinding.voteLabelTv.setVisibility(View.VISIBLE);
+            mBinding.voteTv.setText(String.valueOf(movieDetails.getVoteAverage()));
         }
 
         //Budget
         if (movieDetails.getBudget() != null && movieDetails.getBudget() > 0) {
-            mBudgetTv.setVisibility(View.VISIBLE);
-            mBudgetLabelTv.setVisibility(View.VISIBLE);
-            mBudgetTv.setText(String.format(Locale.ENGLISH, "%,d$", movieDetails.getBudget()).replace(',', ' '));
+            mBinding.budgetTv.setVisibility(View.VISIBLE);
+            mBinding.budgetLabelTv.setVisibility(View.VISIBLE);
+            mBinding.budgetTv.setText(String.format(Locale.ENGLISH, "%,d$", movieDetails.getBudget()).replace(',', ' '));
         }
 
         //Revenue
         if (movieDetails.getRevenue() != null && movieDetails.getRevenue() > 0) {
-            mRevenueTv.setVisibility(View.VISIBLE);
-            mRevenueLabelTv.setVisibility(View.VISIBLE);
-            mRevenueTv.setText(String.format(Locale.ENGLISH, "%,d$", movieDetails.getRevenue()).replace(',', ' '));
+            mBinding.revenueTv.setVisibility(View.VISIBLE);
+            mBinding.revenueLabelTv.setVisibility(View.VISIBLE);
+            mBinding.revenueTv.setText(String.format(Locale.ENGLISH, "%,d$", movieDetails.getRevenue()).replace(',', ' '));
         }
 
         //Homepage
         if (movieDetails.getHomepage() != null) {
-            mHomepageTv.setVisibility(View.VISIBLE);
-            mHomepageLabelTv.setVisibility(View.VISIBLE);
-            mHomepageTv.setText(movieDetails.getHomepage());
+            mBinding.homepageTv.setVisibility(View.VISIBLE);
+            mBinding.homepageLabelTv.setVisibility(View.VISIBLE);
+            mBinding.homepageTv.setText(movieDetails.getHomepage());
         }
 
         //Description
         if (movieDetails.getOverview() != null) {
-            mDescriptionTv.setText(movieDetails.getOverview());
+            mBinding.movieDescriptionTv.setText(movieDetails.getOverview());
         }
 
     }
 
     private void showProgressBar(Boolean isShow) {
         if (isShow != null && isShow) {
-            mProgressBar.setVisibility(View.VISIBLE);
+            mBinding.progressBar.setVisibility(View.VISIBLE);
         } else {
-            mProgressBar.setVisibility(View.GONE);
+            mBinding.progressBar.setVisibility(View.GONE);
         }
     }
 
     private void prepareFavoriteBtn() {
         App.dbRepo.loadFavoriteMovieById(mMovieId).observe(this, favoriteMovieEntry -> {
             if (favoriteMovieEntry == null) {
-                mFavoriteBtn.setText(R.string.add_to_favorite);
-                mFavoriteBtn.setOnClickListener(v -> {
-                    addToFavorite();
-                });
+                mBinding.favoriteBtn.setText(R.string.add_to_favorite);
+                mBinding.favoriteBtn.setOnClickListener(v -> addToFavorite());
             } else {
-                mFavoriteBtn.setText(R.string.delete_from_favorite);
-                mFavoriteBtn.setOnClickListener(v -> {
-                    deleteFromFavorite();
-                });
+                mBinding.favoriteBtn.setText(R.string.delete_from_favorite);
+                mBinding.favoriteBtn.setOnClickListener(v -> deleteFromFavorite());
             }
         });
     }
@@ -302,61 +247,35 @@ public class MovieDetailsFragment extends BaseFragment {
 
     private void showMoviePoster(String posterPath) {
         if (posterPath != null)
-            Picasso.get().load(PICTURE_HUGE_BASE_URL + posterPath).into(mPosterIv);
+            Picasso.get().load(PICTURE_HUGE_BASE_URL + posterPath).into(mBinding.moviePosterIv);
     }
 
-    private void prepareReviews(MovieReviewsResponse movieDetails) {
-        mReviewsContainer.removeAllViews();
-        if (movieDetails.getResults() != null && !movieDetails.getResults().isEmpty()) {
-            mReviewsLabelTv.setVisibility(View.VISIBLE);
-            for (ReviewsResultsItem reviewItem : movieDetails.getResults()) {
-                View reviewView = createReviewView(reviewItem);
-                if (reviewView != null)
-                    mReviewsContainer.addView(reviewView);
-            }
-        }
+    private void initTrailersRecyclerView() {
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), getResources().getInteger(R.integer.list_colons_num), RecyclerView.VERTICAL, false);
+        mBinding.recyclerTrailers.setLayoutManager(layoutManager);
+        mBinding.recyclerTrailers.setHasFixedSize(true);
+        mBinding.recyclerTrailers.setNestedScrollingEnabled(false);
+        mTrailerAdapter = new TrailerAdapter(this);
+        mBinding.recyclerTrailers.setAdapter(mTrailerAdapter);
     }
 
-    private void prepareTrailers(MovieVideosResponse movieVideos) {
-        mTrailerContainer.removeAllViews();
-        if (movieVideos.getResults() != null && !movieVideos.getResults().isEmpty()) {
-            mTrailersLabel.setVisibility(View.VISIBLE);
-            for (TrailersResultsItem trailerItem : movieVideos.getResults()) {
-                View trailerView = createTrailerView(trailerItem);
-                if (trailerView != null)
-                    mTrailerContainer.addView(trailerView);
-            }
-        }
+    private void initReviewsRecyclerView() {
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), getResources().getInteger(R.integer.list_colons_num), RecyclerView.VERTICAL, false);
+        mBinding.recyclerReviews.setLayoutManager(layoutManager);
+        mBinding.recyclerReviews.setHasFixedSize(true);
+        mBinding.recyclerReviews.setNestedScrollingEnabled(false);
+        mReviewAdapter = new ReviewAdapter(this);
+        mBinding.recyclerReviews.setAdapter(mReviewAdapter);
     }
 
-    private View createReviewView(ReviewsResultsItem resultItem) {
-        if (getActivity() != null && resultItem.getId() != null) {
-            LayoutInflater li = LayoutInflater.from(getActivity().getApplicationContext());
-            View reviewView = li.inflate(R.layout.item_view_review, null);
-            TextView authorName = reviewView.findViewById(R.id.author_name_tv);
-            TextView content = reviewView.findViewById(R.id.content_tv);
-            String authorInfo = getString(R.string.movie_users_reviews_author) + resultItem.getAuthor();
-            authorName.setText(authorInfo);
-            content.setText(Html.fromHtml(resultItem.getContent()));
-            return reviewView;
-        }
-        return null;
+    @Override
+    public void onTrailerItemClick(String id, String key) {
+        if (getContext() != null)
+            YoutubeUtil.watchYoutubeVideo(getContext(), key);
     }
 
-    private View createTrailerView(TrailersResultsItem trailerInfo) {
-        if (getActivity() != null && trailerInfo.getId() != null) {
-            LayoutInflater li = LayoutInflater.from(getActivity().getApplicationContext());
-            View trailerView = li.inflate(R.layout.item_view_trailer, null);
-            ConstraintLayout containerItem = trailerView.findViewById(R.id.containerItem);
-            TextView trailerTitle = trailerView.findViewById(R.id.trailerTitle);
-            String trailerTitleStr = trailerInfo.getSite() + ":" + trailerInfo.getName();
-            trailerTitle.setText(trailerTitleStr);
-            containerItem.setOnClickListener(v -> {
-                YoutubeUtil.watchYoutubeVideo(getContext(), trailerInfo.getKey());
-            });
-            return trailerView;
-        }
-        return null;
+    @Override
+    public void onReviewItemClick(String id) {
+        //ignore
     }
-
 }

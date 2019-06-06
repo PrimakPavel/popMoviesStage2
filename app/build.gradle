@@ -12,7 +12,11 @@ android {
             useSupportLibrary = true
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_KEY", API_KEY)
+        try {
+            buildConfigField("String", "API_KEY", API_KEY)
+        } catch (Exception exception) {
+            throw new InvalidUserDataException("You should define API_KEY in gradle.properties!!!\n" + exception.getMessage())
+        }
     }
     buildTypes {
         release {

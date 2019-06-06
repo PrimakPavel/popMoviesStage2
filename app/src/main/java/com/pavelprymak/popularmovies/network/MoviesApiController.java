@@ -1,8 +1,12 @@
 package com.pavelprymak.popularmovies.network;
 
+import android.os.Build;
+
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.squareup.moshi.Moshi;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -17,10 +21,11 @@ public class MoviesApiController {
     public static MoviesApiController getInstance() {
         return ourInstance;
     }
+
     private MoviesApi moviesApi;
 
     private MoviesApiController() {
-        if (moviesApi == null){
+        if (moviesApi == null) {
             moviesApi = getApi();
         }
     }
@@ -29,11 +34,23 @@ public class MoviesApiController {
         return moviesApi;
     }
 
-    private MoviesApi getApi(){
+    private MoviesApi getApi() {
         try {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
             //SAVE Cookie
             httpClient.cookieJar(new MyCookieJar());
+
+            //solved connection problems to backend server for Android 4.4 devices
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                try {
+                    URL url = new URL(Constants.BASE_URL);
+                    NoSSLv3SocketFactory noSSLv3Factory = new NoSSLv3SocketFactory(url);
+                    httpClient.sslSocketFactory(noSSLv3Factory);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             httpClient.connectTimeout(30, TimeUnit.SECONDS);
             httpClient.writeTimeout(30, TimeUnit.SECONDS);
             httpClient.readTimeout(30, TimeUnit.SECONDS);

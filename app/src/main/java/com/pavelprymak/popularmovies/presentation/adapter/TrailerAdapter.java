@@ -51,6 +51,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ItemViewTrailerBinding binding;
+        private static final String EMPTY = "";
 
         TrailerViewHolder(@NonNull ItemViewTrailerBinding trailerBinding) {
             super(trailerBinding.getRoot());
@@ -62,8 +63,11 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
             TrailersResultsItem trailer = mTrailers.get(position);
             if (trailer != null && mContext != null) {
                 //Name
-                String trailerName = trailer.getName();
-                binding.trailerTitle.setText(trailerName);
+                if (trailer.getName() != null) {
+                    binding.trailerTitle.setText(trailer.getName());
+                } else {
+                    binding.trailerTitle.setText(EMPTY);
+                }
             }
         }
 

@@ -52,6 +52,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     class ReviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ItemViewReviewBinding binding;
+        private static final String EMPTY = "";
 
         ReviewViewHolder(@NonNull ItemViewReviewBinding reviewBinding) {
             super(reviewBinding.getRoot());
@@ -63,14 +64,18 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             ReviewsResultsItem review = mReviews.get(position);
             if (review != null && mContext != null) {
                 //Author Name
-                String authorInfo = mContext.getString(R.string.movie_users_reviews_author) + review.getAuthor();
-                binding.authorNameTv.setText(authorInfo);
-                //Content
-                String content = review.getContent();
-                if (content == null) {
-                    content = "";
+                if (review.getAuthor() != null) {
+                    String authorInfo = mContext.getString(R.string.movie_users_reviews_author) + review.getAuthor();
+                    binding.authorNameTv.setText(authorInfo);
+                } else {
+                    binding.authorNameTv.setText(EMPTY);
                 }
-                binding.contentTv.setText(Html.fromHtml(content));
+                //Content
+                if (review.getAuthor() != null) {
+                    binding.contentTv.setText(Html.fromHtml(review.getContent()));
+                } else {
+                    binding.contentTv.setText(EMPTY);
+                }
             }
         }
 

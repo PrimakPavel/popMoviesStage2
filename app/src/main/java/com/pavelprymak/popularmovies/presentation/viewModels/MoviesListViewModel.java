@@ -1,10 +1,13 @@
 package com.pavelprymak.popularmovies.presentation.viewModels;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
@@ -13,6 +16,7 @@ import com.pavelprymak.popularmovies.network.Constants;
 import com.pavelprymak.popularmovies.network.pojo.moviesList.ResultsItem;
 import com.pavelprymak.popularmovies.presentation.common.ActionLiveData;
 import com.pavelprymak.popularmovies.presentation.paging.MoviesDataSourceFactory;
+import com.pavelprymak.popularmovies.utils.SharedPrefApp;
 import com.pavelprymak.popularmovies.utils.convertors.FavoriteMovieEntryToResultsItemConverter;
 import com.pavelprymak.popularmovies.utils.convertors.ListToPagedListConverter;
 
@@ -22,15 +26,18 @@ import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource
 import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.POPULAR_MOVIES;
 import static com.pavelprymak.popularmovies.presentation.paging.MoviesDataSource.TOP_RATED_MOVIES;
 
-public class MoviesListViewModel extends ViewModel {
+public class MoviesListViewModel extends AndroidViewModel {
     private static final int MOVIE_ITEM_ON_PAGE = 20;
-
     private MediatorLiveData<PagedList<ResultsItem>> mMoviesData = new MediatorLiveData<>();
     private LiveData<PagedList<ResultsItem>> mMoviesPagingLiveData;
     private LiveData<PagedList<ResultsItem>> mMoviesFavoriteLiveData;
     private MutableLiveData<Boolean> mLoadData = new MutableLiveData<>();
     private ActionLiveData<Throwable> mErrorData = new ActionLiveData<>();
-    private int mMovieFilterType = POPULAR_MOVIES;
+    private int mMovieFilterType = SharedPrefApp.getMovieFilterType(getApplication().getApplicationContext());
+
+    public MoviesListViewModel(@NonNull Application application) {
+        super(application);
+    }
 
 
     public void prepareMoviePagedList() {
@@ -44,6 +51,7 @@ public class MoviesListViewModel extends ViewModel {
         if (movieType != mMovieFilterType) {
             cleanData();
             mMovieFilterType = movieType;
+            SharedPrefApp.setMoviesFilterType(getApplication().getApplicationContext(), mMovieFilterType);
             if (movieType == FAVORITE_MOVIES) {
                 prepareFavoritesPagedList();
             } else {

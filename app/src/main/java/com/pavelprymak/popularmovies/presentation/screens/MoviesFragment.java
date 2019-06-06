@@ -123,7 +123,9 @@ public class MoviesFragment extends Fragment implements MoviesListItemClickListe
         });
         mMoviesViewModel.getLoadingData().observe(this, this::showProgressBar);
         mMoviesViewModel.getErrorData().observe(this, throwable -> {
-            mAdapter.submitList(null);
+            if (mAdapter != null) {
+                mAdapter.submitList(null);
+            }
             if (throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_AUTH_ERROR)
                     || throwable.getMessage().equals(Constants.HttpErrorCodes.HTTP_NOT_FOUND_ERROR)
                     || throwable.getMessage().equals(Constants.HttpErrorCodes.CONNECTION_ERROR)
@@ -171,6 +173,8 @@ public class MoviesFragment extends Fragment implements MoviesListItemClickListe
     private void initMoviesRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), getResources().getInteger(R.integer.list_colons_num), RecyclerView.VERTICAL, false);
         mBinding.recyclerMovies.setLayoutManager(layoutManager);
+        mAdapter = new MovieAdapter(this);
+        mBinding.recyclerMovies.setAdapter(mAdapter);
     }
 
     private void uncheckAllMenuItems() {

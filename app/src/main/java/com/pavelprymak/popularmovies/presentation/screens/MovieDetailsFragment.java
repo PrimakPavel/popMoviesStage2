@@ -55,6 +55,8 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     private void onRetryBtnClick() {
         mBinding.errorLayout.setVisibility(View.GONE);
         detailsViewModel.getMovieDetailsById(mMovieId, false);
+        detailsViewModel.getMovieVideosById(mMovieId, false);
+        detailsViewModel.getMovieReviewsById(mMovieId, false);
     }
 
     @Override
@@ -82,7 +84,10 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
         detailsViewModel.getMovieVideosById(mMovieId, false);
         detailsViewModel.getMovieReviewsById(mMovieId, false);
         detailsViewModel.movieDetailsData.getData().observe(this, this::showAllMovieDetails);
-        detailsViewModel.movieDetailsData.getError().observe(this, throwable -> mBinding.errorLayout.setVisibility(View.VISIBLE));
+        detailsViewModel.movieDetailsData.getError().observe(this, throwable -> {
+            mBinding.errorLayout.setVisibility(View.VISIBLE);
+            mBinding.favoriteBtn.setVisibility(View.GONE);
+        });
         detailsViewModel.movieDetailsData.getLoading().observe(this, this::showProgressBar);
         detailsViewModel.movieVideosData.getData().observe(this, movieTrailersResponse -> {
             if (movieTrailersResponse != null) {
@@ -112,9 +117,11 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     public void onDestroyView() {
         super.onDestroyView();
         detailsViewModel.movieDetailsData.removeObservers(this);
+        App.dbRepo.loadFavoriteMovieById(mMovieId).removeObservers(this);
     }
 
     private void showAllMovieDetails(MovieDetailsResponse movieDetails) {
+        mBinding.favoriteBtn.setVisibility(View.VISIBLE);
         mMovieDetails = movieDetails;
         showMoviePoster(movieDetails.getPosterPath());
         //Title
@@ -231,14 +238,16 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     }
 
     private void addToFavorite() {
-        FavoriteMovieEntry favoriteMovie = new FavoriteMovieEntry(mMovieDetails.getId(),
-                new Date(),
-                mMovieDetails.getTitle(),
-                mMovieDetails.getPosterPath(),
-                mMovieDetails.getReleaseDate(),
-                mMovieDetails.getVoteAverage(),
-                mMovieDetails.getOriginalLanguage());
-        App.dbRepo.insertFavoriteMovie(favoriteMovie);
+        if (mMovieDetails != null) {
+            FavoriteMovieEntry favoriteMovie = new FavoriteMovieEntry(mMovieDetails.getId(),
+                    new Date(),
+                    mMovieDetails.getTitle(),
+                    mMovieDetails.getPosterPath(),
+                    mMovieDetails.getReleaseDate(),
+                    mMovieDetails.getVoteAverage(),
+                    mMovieDetails.getOriginalLanguage());
+            App.dbRepo.insertFavoriteMovie(favoriteMovie);
+        }
     }
 
     private void deleteFromFavorite() {

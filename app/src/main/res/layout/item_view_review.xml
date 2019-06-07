@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
+        android:id="@+id/review_item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorBackground"
@@ -24,7 +25,11 @@
             android:id="@+id/content_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/textColorSecondary"
             android:textSize="@dimen/small_text_size"
             tools:text="Content information" />

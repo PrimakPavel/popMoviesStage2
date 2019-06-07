@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorBackground"
+        android:fillViewport="true"
         tools:context=".presentation.screens.MovieDetailsFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -353,5 +354,5 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </layout>

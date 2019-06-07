@@ -1,9 +1,12 @@
 package com.pavelprymak.popularmovies.presentation.viewModels;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.facebook.stetho.server.http.HttpStatus;
+import com.pavelprymak.popularmovies.App;
+import com.pavelprymak.popularmovies.db.FavoriteMovieEntry;
 import com.pavelprymak.popularmovies.network.Constants;
 import com.pavelprymak.popularmovies.network.MoviesApiController;
 import com.pavelprymak.popularmovies.network.pojo.movieInfo.MovieDetailsResponse;
@@ -19,6 +22,14 @@ public class MovieDetailsViewModel extends ViewModel {
     public StatesBatch<MovieDetailsResponse> movieDetailsData = new StatesBatch<>();
     public StatesBatch<MovieVideosResponse> movieVideosData = new StatesBatch<>();
     public StatesBatch<MovieReviewsResponse> movieReviewsData = new StatesBatch<>();
+    private LiveData<FavoriteMovieEntry> favoriteMovieInfo;
+
+    public LiveData<FavoriteMovieEntry> getFavoriteMovieInfo(int movieId) {
+        if (favoriteMovieInfo == null) {
+            favoriteMovieInfo = App.dbRepo.loadFavoriteMovieById(movieId);
+        }
+        return favoriteMovieInfo;
+    }
 
     public void getMovieDetailsById(int id, boolean refreshData) {
         if (movieDetailsData.getData().getValue() == null || refreshData) {
@@ -84,5 +95,13 @@ public class MovieDetailsViewModel extends ViewModel {
                 }
             });
         }
+    }
+
+    public void addToFavorite(FavoriteMovieEntry favoriteMovie) {
+        App.dbRepo.insertFavoriteMovie(favoriteMovie);
+    }
+
+    public void deleteFromFavorite(int movieId) {
+        App.dbRepo.deleteByMovieId(movieId);
     }
 }

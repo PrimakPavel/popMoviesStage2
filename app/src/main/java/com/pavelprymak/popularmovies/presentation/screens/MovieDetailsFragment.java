@@ -12,9 +12,9 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pavelprymak.popularmovies.App;
 import com.pavelprymak.popularmovies.R;
 import com.pavelprymak.popularmovies.databinding.FragmentMovieDetailsBinding;
 import com.pavelprymak.popularmovies.db.FavoriteMovieEntry;
@@ -54,6 +54,10 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
 
     private void onRetryBtnClick() {
         mBinding.errorLayout.setVisibility(View.GONE);
+        loadData();
+    }
+
+    private void loadData() {
         detailsViewModel.getMovieDetailsById(mMovieId, false);
         detailsViewModel.getMovieVideosById(mMovieId, false);
         detailsViewModel.getMovieReviewsById(mMovieId, false);
@@ -80,9 +84,7 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         detailsViewModel = ViewModelProviders.of(this).get(MovieDetailsViewModel.class);
-        detailsViewModel.getMovieDetailsById(mMovieId, false);
-        detailsViewModel.getMovieVideosById(mMovieId, false);
-        detailsViewModel.getMovieReviewsById(mMovieId, false);
+        loadData();
         detailsViewModel.movieDetailsData.getData().observe(this, this::showAllMovieDetails);
         detailsViewModel.movieDetailsData.getError().observe(this, throwable -> {
             mBinding.errorLayout.setVisibility(View.VISIBLE);
@@ -117,7 +119,7 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     public void onDestroyView() {
         super.onDestroyView();
         detailsViewModel.movieDetailsData.removeObservers(this);
-        App.dbRepo.loadFavoriteMovieById(mMovieId).removeObservers(this);
+        detailsViewModel.getFavoriteMovieInfo(mMovieId).removeObservers(this);
     }
 
     private void showAllMovieDetails(MovieDetailsResponse movieDetails) {
@@ -226,13 +228,13 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     }
 
     private void prepareFavoriteBtn() {
-        App.dbRepo.loadFavoriteMovieById(mMovieId).observe(this, favoriteMovieEntry -> {
+        detailsViewModel.getFavoriteMovieInfo(mMovieId).observe(this, favoriteMovieEntry -> {
             if (favoriteMovieEntry == null) {
                 mBinding.favoriteBtn.setText(R.string.add_to_favorite);
                 mBinding.favoriteBtn.setOnClickListener(v -> addToFavorite());
             } else {
                 mBinding.favoriteBtn.setText(R.string.delete_from_favorite);
-                mBinding.favoriteBtn.setOnClickListener(v -> deleteFromFavorite());
+                mBinding.favoriteBtn.setOnClickListener(v -> detailsViewModel.deleteFromFavorite(mMovieId));
             }
         });
     }
@@ -246,12 +248,8 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
                     mMovieDetails.getReleaseDate(),
                     mMovieDetails.getVoteAverage(),
                     mMovieDetails.getOriginalLanguage());
-            App.dbRepo.insertFavoriteMovie(favoriteMovie);
+            detailsViewModel.addToFavorite(favoriteMovie);
         }
-    }
-
-    private void deleteFromFavorite() {
-        App.dbRepo.deleteByMovieId(mMovieId);
     }
 
     private void showMoviePoster(String posterPath) {
@@ -269,9 +267,9 @@ public class MovieDetailsFragment extends Fragment implements TrailerListClickLi
     }
 
     private void initReviewsRecyclerView() {
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), getResources().getInteger(R.integer.list_colons_num), RecyclerView.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         mBinding.recyclerReviews.setLayoutManager(layoutManager);
-        mBinding.recyclerReviews.setHasFixedSize(true);
+        mBinding.recyclerReviews.setHasFixedSize(false);
         mBinding.recyclerReviews.setNestedScrollingEnabled(false);
         mReviewAdapter = new ReviewAdapter(this);
         mBinding.recyclerReviews.setAdapter(mReviewAdapter);

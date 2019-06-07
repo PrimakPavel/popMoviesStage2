@@ -20,6 +20,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     private List<ReviewsResultsItem> mReviews;
     private ReviewListItemClickListener clickListener;
     private Context mContext;
+    private static final int LINES_DEFAULT = 2;
+    private static final int LINES_MAX = Integer.MAX_VALUE;
 
     public ReviewAdapter(ReviewListItemClickListener clickListener) {
         this.clickListener = clickListener;
@@ -76,6 +78,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
                 } else {
                     binding.contentTv.setText(EMPTY);
                 }
+                binding.reviewItemContainer.setOnClickListener(v -> moreLessAction());
+            }
+        }
+
+        private void moreLessAction() {
+            if (binding.contentTv.getMaxLines() == LINES_DEFAULT) {
+                binding.contentTv.setMaxLines(LINES_MAX);
+            } else {
+                binding.contentTv.setMaxLines(LINES_DEFAULT);
             }
         }
 
